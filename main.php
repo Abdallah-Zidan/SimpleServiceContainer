@@ -24,7 +24,7 @@ $container = new SimpleContainer();
 
 $container->register($auto);
 
-// short class name or better full class name with namespace using Calculator::class
+//short class name or better full class name with namespace using Calculator::class
 $calc = $container->get('Calculator');
 
 $res = $calc->add(5,7);
@@ -49,12 +49,12 @@ $container->add(Logger::class);
 // =======================//
 
 // use the container
-$calc = $container->get(Calculator::class);
+$calc = $container['Calculator'];
 echo $calc->add(6,18);
 echo PHP_EOL;
 
 
-
+print_r($container);
 
 
 

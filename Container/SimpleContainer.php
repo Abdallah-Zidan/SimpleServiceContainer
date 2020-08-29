@@ -2,10 +2,12 @@
 
 namespace Container;
 
-use Container\Interfaces\ProviderInterface;
-use Container\Interfaces\ContainerInterface;
 
-class SimpleContainer implements ContainerInterface
+use ArrayObject;
+use Container\Interfaces\ContainerInterface;
+use Container\Interfaces\ProviderInterface;
+
+class SimpleContainer extends ArrayObject implements ContainerInterface
 {
 
     /**
@@ -30,6 +32,7 @@ class SimpleContainer implements ContainerInterface
 
     public function __construct()
     {
+        parent::__construct();
         $this->_instances = array();
         $this->_services = array();
         $this->_callbacks = array();
@@ -84,9 +87,9 @@ class SimpleContainer implements ContainerInterface
         }
 
         // maybe the requested name is already short and registered full
-        foreach (array_keys($arr) as $key){
+        foreach (array_keys($arr) as $key) {
             $shortName = $this->extractShortName($key);
-            if($name === $shortName){
+            if ($name === $shortName) {
                 return $key;
             }
         }
@@ -121,6 +124,25 @@ class SimpleContainer implements ContainerInterface
     }
 
     /**
+     * register any service provider that implements ProviderInterface
+     * @param ProviderInterface $provider
+     */
+    public function register(ProviderInterface $provider): void
+    {
+        $provider->register($this);
+    }
+
+    /**
+     * for getting values as arrays for convenience
+     * @param mixed $id
+     * @return mixed|null
+     */
+    public function offsetGet($id)
+    {
+        return $this->get($id);
+    }
+
+    /**
      * gets the instance from instances array, if doesn't exist then
      * or create it using its registered callback, if it doesn't exist then
      * create it using its registered service and dependencies, if it doesn't exist then
@@ -145,7 +167,7 @@ class SimpleContainer implements ContainerInterface
 
         $serviceKey = $this->isRegistered($name, $this->_services);
         if (!$serviceKey) {
-            echo("\n****** warning ***********\nthere is a problem with your dependencies recheck them as this service  $name  might not  exist in the container\n" );
+            echo("\n****** warning ***********\nthere is a problem with your dependencies recheck them as this service  $name  might not  exist in the container\n");
             echo("if you are using autowired provider check that all services have dependencies as services or add the service manually using addWithCallback method\n\n");
             return null;
         }
@@ -175,12 +197,4 @@ class SimpleContainer implements ContainerInterface
 
     }
 
-    /**
-     * register any service provider that implements ProviderInterface
-     * @param ProviderInterface $provider
-     */
-    public function register(ProviderInterface $provider): void
-    {
-        $provider->register($this);
-    }
 }
