@@ -1,0 +1,17 @@
+{
+    "description": "custom service container",
+    "name": "zidan/service-container",
+    
+    "autoload": {
+        "classmap": [
+            "Inc\\",
+            "Container\\"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Abd Allah Zidan",
+            "email": "eng.abdallahzidan@gmail.com"
+        }
+    ]
+}
