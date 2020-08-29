@@ -8,32 +8,23 @@ use ReflectionException;
 
 class AutowiredProvider extends AbstractProvider
 {
-
     /**
-     * @param string  $autowiredPath
-     * @return AutowiredProvider
+     * AutowiredProvider constructor.
+     * @param string $autowiredPath
      */
-    public static function getInstance(string $autowiredPath): AbstractProvider
+    public function __construct(string $autowiredPath)
     {
-        if (!$autowiredPath) {
-            exit("\n******** warning ********\nyou must provide an array of services using normal provider or auto wiring path\n\n");
+        parent::__construct();
+
+        try {
+            $services = $this->getAutowiredServices($autowiredPath);
+        } catch (ReflectionException $e) {
+            echo $e->getMessage();
+            exit("\n******** warning ********\ncould not auto wire classes ... you should consider trying normal provider\n\n");
         }
 
-        if (!self::$_instance) {
+        $this->setServices($services);
 
-            self::$_instance = new self();
-
-            try {
-                $services = self::$_instance->getAutowiredServices($autowiredPath);
-            } catch (ReflectionException $e) {
-                echo $e->getMessage();
-                exit("\n******** warning ********\ncould not auto wire classes ... you should consider trying normal provider\n\n");
-            }
-
-            self::$_instance->setServices($services);
-        }
-
-        return self::$_instance;
     }
 
     /**

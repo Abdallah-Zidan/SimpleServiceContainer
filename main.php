@@ -18,7 +18,7 @@ if (file_exists(__DIR__ . '\\vendor\\autoload.php')
 
 //************** using auto wiring ***************** //
 
-$auto = AutowiredProvider::getInstance(AUTO_WIRE_PATH);
+$auto = new AutowiredProvider(AUTO_WIRE_PATH);
 
 $container = new SimpleContainer();
 

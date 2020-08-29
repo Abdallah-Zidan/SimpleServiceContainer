@@ -4,12 +4,14 @@ namespace Container;
 
 class NormalProvider extends AbstractProvider
 {
-    public static function getInstance(array $services = array() ): AbstractProvider
+    /**
+     * NormalProvider constructor.
+     * @param array $services
+     */
+    public function __construct(array $services = array())
     {
-        if (!self::$_instance) {
-            self::$_instance = new self();
-            self::$_instance->setServices($services);
-        }
-        return self::$_instance;
+        parent::__construct();
+        $this->setServices($services);
     }
+
 }

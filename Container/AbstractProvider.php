@@ -4,7 +4,6 @@
 namespace Container;
 
 
-use BadMethodCallException;
 use Container\Interfaces\ProviderInterface;
 use Container\Interfaces\ContainerInterface;
 
@@ -13,17 +12,11 @@ abstract class AbstractProvider implements ProviderInterface
 {
     protected $services ;
 
-    protected static $_instance;
-
-    protected function __construct()
+    public function __construct()
     {
         $this->services = array();
     }
 
-    public function __clone()
-    {
-        throw new BadMethodCallException('doing it wrong');
-    }
 
     public function getServices(): array
     {
