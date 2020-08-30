@@ -1,11 +1,14 @@
 <?php
 
-namespace Container;
+namespace Container\Classes;
 
 
+use ArgumentCountError;
 use ArrayObject;
 use Container\Interfaces\ContainerInterface;
 use Container\Interfaces\ProviderInterface;
+use Error;
+use Exception;
 
 class SimpleContainer extends ArrayObject implements ContainerInterface
 {
@@ -148,9 +151,10 @@ class SimpleContainer extends ArrayObject implements ContainerInterface
      * create it using its registered service and dependencies, if it doesn't exist then
      * print warning and return null
      * @param string $name
+     * @param null $args
      * @return mixed
      */
-    public function get(string $name)
+    public function get(string $name, $args = null)
     {
 
         $instanceKey = $this->isRegistered($name, $this->_instances);
@@ -162,17 +166,25 @@ class SimpleContainer extends ArrayObject implements ContainerInterface
         $callBackKey = $this->isRegistered($name, $this->_callbacks);
 
         if ($callBackKey) {
-            return $this->_instances[$callBackKey] = call_user_func($this->_callbacks[$callBackKey], $this);
+            try {
+                return $this->_instances[$callBackKey] = call_user_func($this->_callbacks[$callBackKey], $this, $args);
+
+            } catch (ArgumentCountError $error) {
+                exit ("\n**** warning*****\nfew arguments were passed to the class $className that could be missing dependencies issue .. check your container\n");
+
+            } catch (Exception | Error $e) {
+                exit( $e->getMessage());
+            }
         }
 
         $serviceKey = $this->isRegistered($name, $this->_services);
+
         if (!$serviceKey) {
             echo("\n****** warning ***********\nthere is a problem with your dependencies recheck them as this service  $name  might not  exist in the container\n");
-            echo("if you are using autowired provider check that all services have dependencies as services or add the service manually using addWithCallback method\n\n");
-            return null;
+            exit("if you are using autowired provider check that all services have dependencies as services or add the service manually using addWithCallback method\n\n");
         }
 
-        $this->_instances[$serviceKey] = $this->createObject($this->_services[$serviceKey]);
+        $this->_instances[$serviceKey] = $this->createObject($this->_services[$serviceKey], $args);
 
         return $this->_instances[$serviceKey];
     }
@@ -181,9 +193,10 @@ class SimpleContainer extends ArrayObject implements ContainerInterface
      * create a service if its dependencies are ready
      * if not then create them first
      * @param array $service
+     * @param $arguments
      * @return mixed
      */
-    protected function createObject(array $service)
+    protected function createObject(array $service, $arguments)
     {
         $args = array();
 
@@ -191,9 +204,21 @@ class SimpleContainer extends ArrayObject implements ContainerInterface
             $args[] = $this->get($param);
         }
 
+        if ($arguments) {
+            $args = array_merge($args, $arguments);
+        }
+
         $className = $service[0];
 
-        return new $className(...$args);
+        try {
+            return new $className(...$args);
+
+        } catch (ArgumentCountError $error) {
+            exit ("\n**** warning*****\nfew arguments were passed to the class $className that could be missing dependencies issue .. check your container\n");
+
+        } catch (Exception | Error $e) {
+            exit( $e->getMessage());
+        }
 
     }
 
