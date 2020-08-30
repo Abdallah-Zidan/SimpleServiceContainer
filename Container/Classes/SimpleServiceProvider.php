@@ -31,7 +31,7 @@ abstract class SimpleServiceProvider implements ProviderInterface
         if ($this->isAutoWired) {
             $this->addServicesRecursively($services, $this->autoWireHelper);
         } else {
-            $this->setServicesNormally($services);
+            $this->addServicesNormally($services);
         }
 
     }
@@ -42,7 +42,6 @@ abstract class SimpleServiceProvider implements ProviderInterface
      */
     protected function addServicesRecursively(array $services, AutoWireHelper $autoWireHelper): void
     {
-        $this->services = array();
 
         foreach ($services as $service) {
             $this->addServiceRecursively($service, $autoWireHelper);
@@ -83,7 +82,7 @@ abstract class SimpleServiceProvider implements ProviderInterface
     /**
      * @param $services
      */
-    protected function setServicesNormally($services): void
+    protected function addServicesNormally($services): void
     {
         foreach ($services as $service) {
             $this->addService($service);
